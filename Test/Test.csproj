@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
       <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-      <CompilerGeneratedFilesOutputPath>SageBinaryData</CompilerGeneratedFilesOutputPath>
+      <CompilerGeneratedFilesOutputPath>SageBinaryDataGenerated</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
 
   <ItemGroup>

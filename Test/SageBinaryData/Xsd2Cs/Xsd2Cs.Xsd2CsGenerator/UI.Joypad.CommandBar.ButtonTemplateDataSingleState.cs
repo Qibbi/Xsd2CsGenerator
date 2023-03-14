@@ -1,1 +1,0 @@
-﻿// UI\Joypad\CommandBar\ButtonTemplateDataSingleState
