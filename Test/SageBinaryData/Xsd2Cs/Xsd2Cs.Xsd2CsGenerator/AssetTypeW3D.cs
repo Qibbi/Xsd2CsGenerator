@@ -1,0 +1,1 @@
+﻿// AssetTypeW3D
