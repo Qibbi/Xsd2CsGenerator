@@ -45,14 +45,13 @@ public interface IRGBAColorInterface : IRGBColorInterface
 [StructLayout(LayoutKind.Sequential)]
 public struct RGBAColor : IRGBAColorInterface
 {
-    internal float _r;
-    internal float _g;
-    internal float _b;
+    internal RGBColor _base;
+
     internal float _a;
 
-    public float R { get => _r; set => _r = value; }
-    public float G { get => _g; set => _g = value; }
-    public float B { get => _b; set => _b = value; }
+    public float R { get => _base._r; set => _base._r = value; }
+    public float G { get => _base._g; set => _base._g = value; }
+    public float B { get => _base._b; set => _base._b = value; }
     public float A { get => _a; set => _a = value; }
 }
 

@@ -92,8 +92,10 @@ internal sealed class OutputFile
 
         StringBuilder sb = new();
 
+        bool hasStruct = false;
         bool hasEnums = false;
-        bool hasStructOrBitFlags = false;
+        bool hasBitFlags = false;
+        bool hasReference = false;
         List<string> namespaces = new();
         foreach (AOutputType type in OutputTypes)
         {
@@ -101,13 +103,21 @@ internal sealed class OutputFile
             {
                 continue;
             }
-            if (type is OutputEnum)
+            if (type is OutputStruct)
+            {
+                hasStruct = true;
+            }
+            else if (type is OutputEnum)
             {
                 hasEnums = true;
             }
-            else if (type is OutputStruct or OutputBitFlags or OutputReference or OutputWeakReference)
+            else if (type is OutputBitFlags)
             {
-                hasStructOrBitFlags = true;
+                hasBitFlags = true;
+            }
+            else if (type is OutputReference or OutputWeakReference)
+            {
+                hasReference = true;
             }
             if (!namespaces.Contains(type.TargetNamespace))
             {
@@ -124,9 +134,13 @@ internal sealed class OutputFile
         {
             sb.AppendLine("using System.ComponentModel.DataAnnotations;");
         }
-        if (hasStructOrBitFlags)
+        if (hasBitFlags || hasStruct)
         {
             sb.AppendLine("using System.Runtime.InteropServices;");
+        }
+        if (hasReference)
+        {
+            sb.AppendLine("using Relo;");
         }
         sb.AppendLine();
 

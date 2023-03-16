@@ -60,7 +60,7 @@ internal abstract class AOutputType
     {
     }
 
-    public virtual void WriteMemberDeclaration(int indent, StringBuilder sb)
+    public virtual void WriteInheritedMemberDeclaration(int indent, StringBuilder sb)
     {
     }
 

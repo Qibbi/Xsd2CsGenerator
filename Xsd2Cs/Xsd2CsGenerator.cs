@@ -59,7 +59,7 @@ namespace Xsd2Cs
                         }
                         else if (SchemaSet.IsWeakRef(schemaType))
                         {
-                            outputFile.OutputTypes.Add(new OutputWeakReference(_settings, schemaType, type));
+                            outputFile.OutputTypes.Add(new OutputWeakReference(schemaSet.SchemaTypes.Values, _settings, schemaType, type));
                         }
                         // TODO: ref types
                         // TODO: TypedAssetId

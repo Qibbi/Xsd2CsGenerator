@@ -15,11 +15,11 @@ public static partial class Marshaler
 
     public static readonly char[] WhiteSpaces = new[] { ' ', '\t', '\n', '\v', '\f', '\r' };
 
-    public static void Marshal(Node? node, ref IBaseAssetTypeInterface objT, Relo.Tracker state)
+    public static void Marshal(Node? node, ref BaseAssetType objT, Relo.Tracker state)
     {
     }
 
-    public static void Marshal(Node? node, ref IBaseInheritableAssetInterface objT, Relo.Tracker state)
+    public static void Marshal(Node? node, ref BaseInheritableAsset objT, Relo.Tracker state)
     {
     }
 
