@@ -20,12 +20,14 @@ internal sealed class SchemaSet
     private readonly XmlSchemaSet _schemas = new();
     private readonly string _sourceDirectory;
     private string _currentSchema = "<unknown>";
+    private readonly Settings _settings;
 
     public Dictionary<string, XmlSchemaType> AssetTypes { get; } = new();
     public Dictionary<string, List<XmlSchemaType>> SchemaTypes { get; } = new();
 
     public SchemaSet(Settings settings, SourceProductionContext context, ImmutableArray<AdditionalText> files)
     {
+        _settings = settings;
         try
         {
             string schemaFile = files.Where(x => x.Path.EndsWith(settings.EntryXsd)).Select(x => x.Path).FirstOrDefault();
@@ -41,6 +43,23 @@ internal sealed class SchemaSet
         GetAssetTypes();
     }
 
+    public Xsd2Cs.Type? GetType(XmlSchemaType? type)
+    {
+        if (type is null)
+        {
+            return null;
+        }
+
+        foreach (Xsd2Cs.Type result in _settings.Types!.Type!)
+        {
+            if (string.Compare(result.Name, type.Name, StringComparison.Ordinal) == 0)
+            {
+                return result;
+            }
+        }
+        return null;
+    }
+
     public static bool IsSimple(XmlSchemaType? type)
     {
         return type is XmlSchemaSimpleType;
@@ -48,6 +67,13 @@ internal sealed class SchemaSet
 
     public static bool IsRef(XmlSchemaType? type)
     {
+        if (type is XmlSchemaSimpleType simpleType &&
+            simpleType.DerivedBy == XmlSchemaDerivationMethod.Restriction &&
+            simpleType.Content is XmlSchemaSimpleTypeRestriction restriction &&
+            restriction.BaseTypeName.Name.Equals("AssetReference", StringComparison.Ordinal))
+        {
+            return true;
+        }
         if (type is XmlSchemaSimpleType && type.UnhandledAttributes is not null)
         {
             foreach (XmlAttribute attribute in type.UnhandledAttributes)
@@ -63,6 +89,13 @@ internal sealed class SchemaSet
 
     public static bool IsWeakRef(XmlSchemaType? type)
     {
+        if (type is XmlSchemaSimpleType simpleType &&
+            simpleType.DerivedBy == XmlSchemaDerivationMethod.Restriction &&
+            simpleType.Content is XmlSchemaSimpleTypeRestriction restriction &&
+            restriction.BaseTypeName.Name.Equals("WeakReference", StringComparison.Ordinal))
+        {
+            return true;
+        }
         if (type is XmlSchemaSimpleType && type.UnhandledAttributes is not null)
         {
             foreach (XmlAttribute attribute in type.UnhandledAttributes)

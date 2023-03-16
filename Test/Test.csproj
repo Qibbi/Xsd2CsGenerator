@@ -7,6 +7,7 @@
     <Nullable>enable</Nullable>
       <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
       <CompilerGeneratedFilesOutputPath>SageBinaryDataGenerated</CompilerGeneratedFilesOutputPath>
+      <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,6 +17,10 @@
   <ItemGroup>
       <AdditionalFiles Include="Xsd2CsSettings.xml" />
       <AdditionalFiles Include="xsd\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="SageBinaryDataGenerated\Xsd2Cs\" />
   </ItemGroup>
 
 </Project>

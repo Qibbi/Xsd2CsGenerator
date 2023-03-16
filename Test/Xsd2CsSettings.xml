@@ -12,6 +12,7 @@
         <!-- Document Tags -->
         <Type Name="Tag" TargetNamespace="" declare="none" marshal="false" />
         <Type Name="Include" TargetNamespace="" declare="none" marshal="false" />
+        <Type Name="IncludeType" TargetNamespace="" declare="none" marshal="false" />
         <Type Name="Define" TargetNamespace="" declare="none" marshal="false" />
         <Type Name="AssetDeclaration" TargetNamespace="" declare="none" marshal="false" />
 

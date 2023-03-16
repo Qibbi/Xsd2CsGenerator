@@ -5,6 +5,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
@@ -18,12 +19,7 @@ namespace Xsd2Cs
 
         private void Setup(SourceProductionContext context, ImmutableArray<AdditionalText> settings)
         {
-            AdditionalText? settingsFile = settings.FirstOrDefault();
-            if (settingsFile is null)
-            {
-                throw new ArgumentNullException("No 'Xsd2CsSettings.xml' found.");
-            }
-
+            AdditionalText? settingsFile = settings.FirstOrDefault() ?? throw new ArgumentNullException("No 'Xsd2CsSettings.xml' found.");
             XmlSerializer serializer = new(typeof(Settings));
             string settingsText = settingsFile.GetText(context.CancellationToken)?.ToString()!;
             StringReader reader = new(settingsText);
@@ -38,23 +34,32 @@ namespace Xsd2Cs
                 throw new InvalidOperationException("No settings loaded.");
             }
             SchemaSet schemaSet = new(_settings, context, files);
+            List<OutputFile> outputFiles = new();
             foreach (KeyValuePair<string, List<XmlSchemaType>> schemaFile in schemaSet.SchemaTypes)
             {
-                if (_excludedIncludes.Contains(schemaFile.Key))
-                {
-                    continue;
-                }
+                OutputFile outputFile = new(schemaFile.Key, _excludedIncludes.Contains(schemaFile.Key));
+                outputFiles.Add(outputFile);
+
                 foreach (XmlSchemaType schemaType in schemaFile.Value)
                 {
+                    Xsd2Cs.Type? type = schemaSet.GetType(schemaType);
                     if (SchemaSet.IsSimple(schemaType))
                     {
                         if (SchemaSet.IsEnum(schemaType))
                         {
-                            // TODO: add enum
+                            outputFile.OutputTypes.Add(new OutputEnum(_settings, schemaType, type));
                         }
                         else if (SchemaSet.IsBitFlags(schemaType))
                         {
-                            // TODO: add bitflags
+                            outputFile.OutputTypes.Add(new OutputBitFlags(_settings, schemaType, type));
+                        }
+                        else if (SchemaSet.IsRef(schemaType))
+                        {
+                            outputFile.OutputTypes.Add(new OutputReference(schemaSet.SchemaTypes.Values, _settings, schemaType, type));
+                        }
+                        else if (SchemaSet.IsWeakRef(schemaType))
+                        {
+                            outputFile.OutputTypes.Add(new OutputWeakReference(_settings, schemaType, type));
                         }
                         // TODO: ref types
                         // TODO: TypedAssetId
@@ -63,10 +68,19 @@ namespace Xsd2Cs
                     {
                         // TODO: complex types based on simple types (like MultisoundSubsoundRef)
                         // TODO: polymorphic type
-                        // TODO: add struct
+                        outputFile.OutputTypes.Add(new OutputStruct(schemaSet.SchemaTypes.Values, _settings, schemaType, type));
                     }
                 }
-                context.AddSource(schemaFile.Key.Replace('\\', '.'), $"// {schemaFile.Key}");
+            }
+            OutputFile.Link(outputFiles);
+            foreach (OutputFile outputFile in outputFiles)
+            {
+                if (outputFile.IsExcluded)
+                {
+                    continue;
+                }
+                context.AddSource(outputFile.Name.Replace('\\', '.'), outputFile.WriteDeclaration());
+                context.AddSource(outputFile.Name.Replace('\\', '.') + ".Marshaler", outputFile.WriteMarshaler(_settings.Types!.TargetNamespace!));
             }
         }
 
