@@ -19,12 +19,13 @@ internal sealed class OutputFile
         IsExcluded = isExcluded;
     }
 
-    public static void WriteIndent(int indent, StringBuilder sb)
+    public static StringBuilder WriteIndent(int indent, StringBuilder sb)
     {
         for (int idx = 0; idx < indent; ++idx)
         {
             sb.Append("    ");
         }
+        return sb;
     }
 
     public static XmlSchemaType? GetSchemaType(IEnumerable<List<XmlSchemaType>> schemaTypes, string name)
@@ -179,12 +180,11 @@ internal sealed class OutputFile
         {
             sb.AppendLine("}");
         }
-        sb.AppendLine();
 
         return sb.ToString();
     }
 
-    public string WriteMarshaler(string targetNamespace)
+    public string WriteMarshaler()
     {
         if (OutputTypes.Count == 0)
         {
@@ -197,9 +197,7 @@ internal sealed class OutputFile
 
         sb.AppendLine("using System.ComponentModel.DataAnnotations;");
         sb.AppendLine("using System.Runtime.CompilerServices;");
-        sb.AppendLine();
-
-        sb.AppendLine($"namespace {targetNamespace};");
+        sb.AppendLine("using static global::Marshaler;");
         sb.AppendLine();
 
         sb.AppendLine("partial class Marshaler");
@@ -217,7 +215,6 @@ internal sealed class OutputFile
 
         indent--;
         sb.AppendLine("}");
-        sb.AppendLine();
 
         return sb.ToString();
     }

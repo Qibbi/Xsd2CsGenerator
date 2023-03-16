@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+      <ProjectReference Include="..\BinaryAssetBuilder.Utility\BinaryAssetBuilder.Utility.csproj" />
       <ProjectReference Include="..\Xsd2Cs\Xsd2Cs.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 

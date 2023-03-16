@@ -47,8 +47,7 @@ internal sealed class OutputStruct : AOutputType
 
     public override void WriteTypeDeclaration(int indent, StringBuilder sb)
     {
-        WriteIndent(indent, sb);
-        sb.Append($"public interface I{Name}Interface");
+        WriteIndent(indent, sb).Append($"public interface I{Name}Interface");
         if (BaseType is null or OutputReference or OutputWeakReference)
         {
             sb.AppendLine();
@@ -57,63 +56,50 @@ internal sealed class OutputStruct : AOutputType
         {
             sb.AppendLine($" : I{BaseType.Name}Interface");
         }
-        WriteIndent(indent, sb);
-        sb.AppendLine("{");
+        WriteIndent(indent, sb).AppendLine("{");
         indent++;
 
         indent--;
-        WriteIndent(indent, sb);
-        sb.AppendLine("}");
+        WriteIndent(indent, sb).AppendLine("}");
 
-        WriteIndent(indent, sb);
-        sb.AppendLine("[StructLayout(LayoutKind.Sequential)]");
-        WriteIndent(indent, sb);
-        sb.AppendLine($"public unsafe struct {Name} : I{Name}Interface");
-        WriteIndent(indent, sb);
-        sb.AppendLine("{");
+        WriteIndent(indent, sb).AppendLine("[StructLayout(LayoutKind.Sequential)]");
+        WriteIndent(indent, sb).AppendLine($"public unsafe struct {Name} : I{Name}Interface");
+        WriteIndent(indent, sb).AppendLine("{");
         indent++;
 
         if (BaseType is not null)
         {
-            WriteIndent(indent, sb);
-            sb.AppendLine($"// {BaseType.Name} interface");
+            WriteIndent(indent, sb).AppendLine($"// {BaseType.Name} interface");
             if (BaseType is OutputReference reference)
             {
-                WriteIndent(indent, sb);
-                sb.AppendLine($"internal AssetReference<{reference.RefType!.Name}> _value;");
+                WriteIndent(indent, sb).AppendLine($"internal AssetReference<{reference.RefType!.Name}> _value;");
             }
             else if (BaseType is OutputWeakReference weakReference)
             {
-                WriteIndent(indent, sb);
-                sb.AppendLine($"internal TypedAssetId<{weakReference.RefType!.Name}> _value;");
+                WriteIndent(indent, sb).AppendLine($"internal TypedAssetId<{weakReference.RefType!.Name}> _value;");
             }
             else
             {
-                WriteIndent(indent, sb);
-                sb.AppendLine($"internal {BaseType!.TargetNamespace}.{BaseType!.Name} _base;");
+                WriteIndent(indent, sb).AppendLine($"internal {BaseType!.TargetNamespace}.{BaseType!.Name} _base;");
             }
             sb.AppendLine();
             BaseType.WriteInheritedMemberDeclaration(indent, sb);
-            WriteIndent(indent, sb);
-            sb.AppendLine($"// End {BaseType.Name} interface");
+            WriteIndent(indent, sb).AppendLine($"// End {BaseType.Name} interface");
             sb.AppendLine();
         }
 
         // TODO:
 
         indent--;
-        WriteIndent(indent, sb);
-        sb.AppendLine("}");
+        WriteIndent(indent, sb).AppendLine("}");
     }
 
     public override void WriteMarshal(int indent, StringBuilder sb)
     {
         string name = $"{TargetNamespace}.{Name}";
         
-        WriteIndent(indent, sb);
-        sb.AppendLine($"public static unsafe void Marshal(Xml.Node? node, ref {name} objT, Relo.Tracker tracker)");
-        WriteIndent(indent, sb);
-        sb.AppendLine("{");
+        WriteIndent(indent, sb).AppendLine($"public static unsafe void Marshal(Xml.Node? node, ref {name} objT, Relo.Tracker tracker)");
+        WriteIndent(indent, sb).AppendLine("{");
         indent++;
         
         if (BaseType is not null)
@@ -121,20 +107,17 @@ internal sealed class OutputStruct : AOutputType
             if (BaseType is OutputReference or OutputWeakReference)
             {
                 sb.AppendLine();
-                WriteIndent(indent, sb);
-                sb.AppendLine($"Marshal(node, ref objT._value, tracker);");
+                WriteIndent(indent, sb).AppendLine($"Marshal(node, ref objT._value, tracker);");
             }
             else
             {
                 sb.AppendLine();
-                WriteIndent(indent, sb);
-                sb.AppendLine($"Marshal(node, ref objT._base, tracker);");
+                WriteIndent(indent, sb).AppendLine($"Marshal(node, ref objT._base, tracker);");
             }
         }
         
         indent--;
-        WriteIndent(indent, sb);
-        sb.AppendLine("}");
+        WriteIndent(indent, sb).AppendLine("}");
         
         sb.AppendLine();
     }

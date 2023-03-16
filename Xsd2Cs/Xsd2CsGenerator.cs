@@ -61,8 +61,6 @@ namespace Xsd2Cs
                         {
                             outputFile.OutputTypes.Add(new OutputWeakReference(schemaSet.SchemaTypes.Values, _settings, schemaType, type));
                         }
-                        // TODO: ref types
-                        // TODO: TypedAssetId
                     }
                     else
                     {
@@ -80,8 +78,9 @@ namespace Xsd2Cs
                     continue;
                 }
                 context.AddSource(outputFile.Name.Replace('\\', '.'), outputFile.WriteDeclaration());
-                context.AddSource(outputFile.Name.Replace('\\', '.') + ".Marshaler", outputFile.WriteMarshaler(_settings.Types!.TargetNamespace!));
+                context.AddSource(outputFile.Name.Replace('\\', '.') + ".Marshaler", outputFile.WriteMarshaler());
             }
+            context.AddSource("Marshaler", OutputMarshaler.Write());
         }
 
         public void Initialize(IncrementalGeneratorInitializationContext context)

@@ -93,95 +93,74 @@ internal sealed class OutputEnum : AOutputType
 
     public override void WriteTypeDeclaration(int indent, StringBuilder sb)
     {
-        WriteIndent(indent, sb);
-        sb.AppendLine($"public enum {Name}");
-        WriteIndent(indent, sb);
-        sb.AppendLine("{");
+        WriteIndent(indent, sb).AppendLine($"public enum {Name}");
+        WriteIndent(indent, sb).AppendLine("{");
         indent++;
-
-        foreach (EnumValue enumValue in EnumValues)
         {
-            WriteIndent(indent, sb);
-            sb.AppendLine($"[Display(Name = \"{enumValue.Name}\")] {EnumItemPrefix + enumValue.Name} = {enumValue.Value},");
+            foreach (EnumValue enumValue in EnumValues)
+            {
+                WriteIndent(indent, sb).AppendLine($"[Display(Name = \"{enumValue.Name}\")] {EnumItemPrefix + enumValue.Name} = {enumValue.Value},");
+            }
         }
-
         indent--;
-        WriteIndent(indent, sb);
-        sb.AppendLine("}");
+        WriteIndent(indent, sb).AppendLine("}");
     }
 
     public override void WriteMarshal(int indent, StringBuilder sb)
     {
         string name = $"{TargetNamespace}.{Name}";
 
-        WriteIndent(indent, sb);
-        sb.AppendLine($"public static unsafe void Marshal(string? text, ref {name} objT, Relo.Tracker tracker)");
-        WriteIndent(indent, sb);
-        sb.AppendLine("{");
+        WriteIndent(indent, sb).AppendLine($"public static unsafe void Marshal(string? text, ref {name} objT, Relo.Tracker tracker)");
+        WriteIndent(indent, sb).AppendLine("{");
         indent++;
+        {
+            WriteIndent(indent, sb).AppendLine("if (text is null)");
+            WriteIndent(indent, sb).AppendLine("{");
+            indent++;
+            {
+                WriteIndent(indent, sb).AppendLine("return;");
+            }
+            indent--;
+            WriteIndent(indent, sb).AppendLine("}");
 
-        WriteIndent(indent, sb);
-        sb.AppendLine("if (text is null)");
-        WriteIndent(indent, sb);
-        sb.AppendLine("{");
+            WriteIndent(indent, sb).AppendLine("Marshal(text.AsSpan(), ref objT, tracker);");
+        }
+        indent--;
+        WriteIndent(indent, sb).AppendLine("}");
+
+        WriteIndent(indent, sb).AppendLine($"public static unsafe void Marshal(ReadOnlySpan<char> text, ref {name} objT, Relo.Tracker tracker)");
+        WriteIndent(indent, sb).AppendLine("{");
         indent++;
-        WriteIndent(indent, sb);
-        sb.AppendLine("return;");
+        {
+            WriteIndent(indent, sb).AppendLine($"Type type = typeof({name});");
+            WriteIndent(indent, sb).AppendLine("foreach (System.Reflection.FieldInfo field in type.GetFields())");
+            WriteIndent(indent, sb).AppendLine("{");
+            indent++;
+            {
+                WriteIndent(indent, sb).AppendLine("if (Attribute.GetCustomAttribute(field, typeof(DisplayAttribute)) is DisplayAttribute displayAttribute && text.SequenceCompareTo(displayAttribute.Name) == 0)");
+                WriteIndent(indent, sb).AppendLine("{");
+                indent++;
+                {
+                    WriteIndent(indent, sb).AppendLine($"objT = ({name})field.GetValue(null)!;");
+                }
+                indent--;
+                WriteIndent(indent, sb).AppendLine("}");
+                WriteIndent(indent, sb).AppendLine("if (text.SequenceCompareTo(field.Name) == 0)");
+                WriteIndent(indent, sb).AppendLine("{");
+                indent++;
+                {
+                    WriteIndent(indent, sb).AppendLine($"objT = ({name})field.GetValue(null)!;");
+                }
+                indent--;
+                WriteIndent(indent, sb).AppendLine("}");
+
+                WriteIndent(indent, sb).AppendLine($"tracker.InplaceEndianToPlatform(ref Unsafe.As<{name}, uint>(ref objT));");
+            }
+            indent--;
+            WriteIndent(indent, sb).AppendLine("}");
+        }
         indent--;
-        WriteIndent(indent, sb);
-        sb.AppendLine("}");
-
-        WriteIndent(indent, sb);
-        sb.AppendLine("Marshal(text.AsSpan(), ref objT, tracker);");
-
-        indent--;
-        WriteIndent(indent, sb);
-        sb.AppendLine("}");
-
-        WriteIndent(indent, sb);
-        sb.AppendLine($"public static unsafe void Marshal(ReadOnlySpan<char> text, ref {name} objT, Relo.Tracker tracker)");
-        WriteIndent(indent, sb);
-        sb.AppendLine("{");
-        indent++;
-
-        WriteIndent(indent, sb);
-        sb.AppendLine($"Type type = typeof({name});");
-        WriteIndent(indent, sb);
-        sb.AppendLine("foreach (System.Reflection.FieldInfo field in type.GetFields())");
-        WriteIndent(indent, sb);
-        sb.AppendLine("{");
-        indent++;
-        WriteIndent(indent, sb);
-        sb.AppendLine("if (Attribute.GetCustomAttribute(field, typeof(DisplayAttribute)) is DisplayAttribute displayAttribute && text.SequenceCompareTo(displayAttribute.Name) == 0)");
-        WriteIndent(indent, sb);
-        sb.AppendLine("{");
-        indent++;
-        WriteIndent(indent, sb);
-        sb.AppendLine($"objT = ({name})field.GetValue(null)!;");
-        indent--;
-        WriteIndent(indent, sb);
-        sb.AppendLine("}");
-        WriteIndent(indent, sb);
-        sb.AppendLine("if (text.SequenceCompareTo(field.Name) == 0)");
-        WriteIndent(indent, sb);
-        sb.AppendLine("{");
-        indent++;
-        WriteIndent(indent, sb);
-        sb.AppendLine($"objT = ({name})field.GetValue(null)!;");
-        indent--;
-        WriteIndent(indent, sb);
-        sb.AppendLine("}");
-
-        WriteIndent(indent, sb);
-        sb.AppendLine($"tracker.InplaceEndianToPlatform(ref Unsafe.As<{name}, uint>(ref objT));");
-
-        indent--;
-        WriteIndent(indent, sb);
-        sb.AppendLine("}");
-
-        indent--;
-        WriteIndent(indent, sb);
-        sb.AppendLine("}");
+        WriteIndent(indent, sb).AppendLine("}");
 
         sb.AppendLine();
     }

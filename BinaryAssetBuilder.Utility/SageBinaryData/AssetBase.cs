@@ -45,7 +45,7 @@ public interface IRGBAColorInterface : IRGBColorInterface
 [StructLayout(LayoutKind.Sequential)]
 public struct RGBAColor : IRGBAColorInterface
 {
-    internal RGBColor _base;
+    public RGBColor _base;
 
     internal float _a;
 

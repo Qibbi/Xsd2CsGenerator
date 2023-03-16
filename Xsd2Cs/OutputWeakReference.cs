@@ -39,8 +39,7 @@ internal sealed class OutputWeakReference : AOutputType
 
     public override void WriteInheritedMemberDeclaration(int indent, StringBuilder sb)
     {
-        WriteIndent(indent, sb);
-        sb.AppendLine($"public TypedAssetId<{RefType!.Name}> Value {{ get => _value; set => _value = value; }}");
+        WriteIndent(indent, sb).AppendLine($"public TypedAssetId<{RefType!.Name}> Value {{ get => _value; set => _value = value; }}");
     }
 
     public override void WriteTypeDeclaration(int indent, StringBuilder sb)
