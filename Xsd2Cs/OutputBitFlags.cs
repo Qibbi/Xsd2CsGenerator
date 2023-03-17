@@ -65,6 +65,7 @@ internal sealed class OutputBitFlags : AOutputType
     {
         string name = $"{TargetNamespace}.{Name}";
 
+        WriteIndent(indent, sb).AppendLine("[MethodImpl(MethodImplOptions.AggressiveInlining)]");
         WriteIndent(indent, sb).AppendLine($"public static unsafe void Marshal(string? text, ref {name} objT, Relo.Tracker tracker)");
         WriteIndent(indent, sb).AppendLine("{");
         indent++;
@@ -77,26 +78,55 @@ internal sealed class OutputBitFlags : AOutputType
             }
             indent--;
             WriteIndent(indent, sb).AppendLine("}");
-
             WriteIndent(indent, sb).AppendLine();
+            WriteIndent(indent, sb).AppendLine("Marshal(text.AsSpan(), ref objT, tracker);");
+        }
+        indent--;
+        WriteIndent(indent, sb).AppendLine("}");
 
-            WriteIndent(indent, sb).AppendLine("string[] tokens = text.Split(WhiteSpaces, StringSplitOptions.RemoveEmptyEntries);");
-            WriteIndent(indent, sb).AppendLine("if (tokens.Length == 0)");
+        WriteIndent(indent, sb).AppendLine();
+        WriteIndent(indent, sb).AppendLine($"public static unsafe void Marshal(ReadOnlySpan<char> text, ref {name} objT, Relo.Tracker tracker)");
+        WriteIndent(indent, sb).AppendLine("{");
+        indent++;
+        {
+            WriteIndent(indent, sb).AppendLine("int tokenStart = 0;");
+            WriteIndent(indent, sb).AppendLine("for (int idx = 0; idx <= text.Length; ++idx)");
             WriteIndent(indent, sb).AppendLine("{");
             indent++;
             {
-                WriteIndent(indent, sb).AppendLine("return;");
-            }
-            indent--;
-            WriteIndent(indent, sb).AppendLine("}");
+                WriteIndent(indent, sb).AppendLine("if (idx < text.Length)");
+                WriteIndent(indent, sb).AppendLine("{");
+                indent++;
+                {
+                    WriteIndent(indent, sb).AppendLine("if (!char.IsWhiteSpace(text[idx]))");
+                    WriteIndent(indent, sb).AppendLine("{");
+                    indent++;
+                    {
+                        WriteIndent(indent, sb).AppendLine("continue;");
+                    }
+                    indent--;
+                    WriteIndent(indent, sb).AppendLine("}");
+                    WriteIndent(indent, sb).AppendLine("if (idx == tokenStart)");
+                    WriteIndent(indent, sb).AppendLine("{");
+                    indent++;
+                    {
+                        int tokenStart = 0;
+                        int idx = 0;
+                        ReadOnlySpan<char> text = ReadOnlySpan<char>.Empty;
+                        ReadOnlySpan<char> token = text.Slice(tokenStart, idx - tokenStart);
+                        WriteIndent(indent, sb).AppendLine("tokenStart++;");
+                        WriteIndent(indent, sb).AppendLine("continue;");
+                    }
+                    indent--;
+                    WriteIndent(indent, sb).AppendLine("}");
+                }
+                indent--;
+                WriteIndent(indent, sb).AppendLine("}");
+                WriteIndent(indent, sb).AppendLine("ReadOnlySpan<char> token = text[tokenStart..idx];");
+                WriteIndent(indent, sb).AppendLine("tokenStart = idx + 1;");
 
-            sb.AppendLine();
+                sb.AppendLine();
 
-            WriteIndent(indent, sb).AppendLine("for (int idy = 0; idy < tokens.Length; ++idy)");
-            WriteIndent(indent, sb).AppendLine("{");
-            indent++;
-            {
-                WriteIndent(indent, sb).AppendLine("ReadOnlySpan<char> token = tokens[idy];");
                 WriteIndent(indent, sb).AppendLine("bool includeToken = true;");
                 WriteIndent(indent, sb).AppendLine("if (token[0] == '+')");
                 WriteIndent(indent, sb).AppendLine("{");
@@ -124,11 +154,11 @@ internal sealed class OutputBitFlags : AOutputType
                 WriteIndent(indent, sb).AppendLine("{");
                 indent++;
                 {
-                    WriteIndent(indent, sb).AppendLine($"for (int idx = 0; idx < {name}.NumSpans; ++idx)");
+                    WriteIndent(indent, sb).AppendLine($"for (int idy = 0; idy < {name}.NumSpans; ++idy)");
                     WriteIndent(indent, sb).AppendLine("{");
                     indent++;
                     {
-                        WriteIndent(indent, sb).AppendLine("objT.Value[idx] = uint.MaxValue;");
+                        WriteIndent(indent, sb).AppendLine("objT.Value[idy] = uint.MaxValue;");
                     }
                     indent--;
                     WriteIndent(indent, sb).AppendLine("}");

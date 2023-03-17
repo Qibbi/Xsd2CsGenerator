@@ -28,10 +28,6 @@ internal static class OutputMarshaler
 
             sb.AppendLine();
 
-            WriteIndent(indent, sb).AppendLine("public static readonly char[] WhiteSpaces = new[] { ' ', '\\t', '\\n', '\\v', '\\f', '\\r' };");
-
-            sb.AppendLine();
-
             WriteIndent(indent, sb).AppendLine("public static void Marshal(Node? node, ref SageBinaryData.BaseAssetType objT, Relo.Tracker state)");
             WriteIndent(indent, sb).AppendLine("{");
             WriteIndent(indent, sb).AppendLine("}");

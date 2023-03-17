@@ -5,23 +5,17 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-      <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-      <CompilerGeneratedFilesOutputPath>SageBinaryDataGenerated</CompilerGeneratedFilesOutputPath>
-      <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
-      <ProjectReference Include="..\BinaryAssetBuilder.Utility\BinaryAssetBuilder.Utility.csproj" />
-      <ProjectReference Include="..\Xsd2Cs\Xsd2Cs.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\BinaryAssetBuilder.Utility\BinaryAssetBuilder.Utility.csproj" />
+    <ProjectReference Include="..\Xsd2Cs\Xsd2Cs.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
-      <AdditionalFiles Include="Xsd2CsSettings.xml" />
-      <AdditionalFiles Include="xsd\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="SageBinaryDataGenerated\Xsd2Cs\" />
+    <AdditionalFiles Include="Xsd2CsSettings.xml" />
+    <AdditionalFiles Include="xsd\**" />
   </ItemGroup>
 
 </Project>
