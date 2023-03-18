@@ -11,6 +11,7 @@ internal static class OutputMarshaler
 
         int indent = 0;
 
+        sb.AppendLine("using System.Runtime.CompilerServices;");
         sb.AppendLine("using Xml;");
         sb.AppendLine();
 
@@ -28,15 +29,51 @@ internal static class OutputMarshaler
 
             sb.AppendLine();
 
+            WriteIndent(indent, sb).AppendLine("[MethodImpl(MethodImplOptions.AggressiveInlining)]");
             WriteIndent(indent, sb).AppendLine("public static void Marshal(Node? node, ref SageBinaryData.BaseAssetType objT, Relo.Tracker state)");
             WriteIndent(indent, sb).AppendLine("{");
             WriteIndent(indent, sb).AppendLine("}");
+            WriteIndent(indent, sb).AppendLine("[MethodImpl(MethodImplOptions.AggressiveInlining)]");
             WriteIndent(indent, sb).AppendLine("public static void Marshal(Node? node, ref SageBinaryData.BaseInheritableAsset objT, Relo.Tracker state)");
             WriteIndent(indent, sb).AppendLine("{");
             WriteIndent(indent, sb).AppendLine("}");
 
             sb.AppendLine();
 
+            WriteIndent(indent, sb).AppendLine("[MethodImpl(MethodImplOptions.AggressiveInlining)]");
+            WriteIndent(indent, sb).AppendLine("public static void Marshal<T>(Node? node, ref Relo.AssetReference<T> objT, Relo.Tracker state) where T : unmanaged");
+            WriteIndent(indent, sb).AppendLine("{");
+            indent++;
+            {
+                WriteIndent(indent, sb).AppendLine("if (node is null)");
+                WriteIndent(indent, sb).AppendLine("{");
+                indent++;
+                {
+                    WriteIndent(indent, sb).AppendLine("return;");
+                }
+                indent--;
+                WriteIndent(indent, sb).AppendLine("}");
+                WriteIndent(indent, sb).AppendLine("Marshal(node.Value, ref objT, state);");
+            }
+            indent--;
+            WriteIndent(indent, sb).AppendLine("}");
+            WriteIndent(indent, sb).AppendLine("[MethodImpl(MethodImplOptions.AggressiveInlining)]");
+            WriteIndent(indent, sb).AppendLine("public static void Marshal<T>(Value? value, ref Relo.AssetReference<T> objT, Relo.Tracker state) where T : unmanaged");
+            WriteIndent(indent, sb).AppendLine("{");
+            indent++;
+            {
+                WriteIndent(indent, sb).AppendLine("if (value is null)");
+                WriteIndent(indent, sb).AppendLine("{");
+                indent++;
+                {
+                    WriteIndent(indent, sb).AppendLine("return;");
+                }
+                indent--;
+                WriteIndent(indent, sb).AppendLine("}");
+                WriteIndent(indent, sb).AppendLine("Marshal(value.Text, ref objT, state);");
+            }
+            indent--;
+            WriteIndent(indent, sb).AppendLine("}");
             WriteIndent(indent, sb).AppendLine("public static void Marshal<T>(ReadOnlySpan<char> text, ref Relo.AssetReference<T> objT, Relo.Tracker state) where T : unmanaged");
             WriteIndent(indent, sb).AppendLine("{");
             indent++;
@@ -49,44 +86,12 @@ internal static class OutputMarshaler
                     WriteIndent(indent, sb).AppendLine("return;");
                 }
                 indent--;
-                sb.AppendLine("}");
+                WriteIndent(indent, sb).AppendLine("}");
                 WriteIndent(indent, sb).AppendLine("int value = int.Parse(text[(index + 1)..]);");
                 WriteIndent(indent, sb).AppendLine("state.AddReference(ref objT, value);");
             }
             indent--;
-            sb.AppendLine("}");
-            WriteIndent(indent, sb).AppendLine("public static void Marshal<T>(Value? value, ref Relo.AssetReference<T> objT, Relo.Tracker state) where T : unmanaged");
-            WriteIndent(indent, sb).AppendLine("{");
-            indent++;
-            {
-                WriteIndent(indent, sb).AppendLine("if (value is null)");
-                WriteIndent(indent, sb).AppendLine("{");
-                indent++;
-                {
-                    WriteIndent(indent, sb).AppendLine("return;");
-                }
-                indent--;
-                sb.AppendLine("}");
-                WriteIndent(indent, sb).AppendLine("Marshal(value.Text, ref objT, state);");
-            }
-            indent--;
-            sb.AppendLine("}");
-            WriteIndent(indent, sb).AppendLine("public static void Marshal<T>(Node? node, ref Relo.AssetReference<T> objT, Relo.Tracker state) where T : unmanaged");
-            WriteIndent(indent, sb).AppendLine("{");
-            indent++;
-            {
-                WriteIndent(indent, sb).AppendLine("if (node is null)");
-                WriteIndent(indent, sb).AppendLine("{");
-                indent++;
-                {
-                    WriteIndent(indent, sb).AppendLine("return;");
-                }
-                indent--;
-                sb.AppendLine("}");
-                WriteIndent(indent, sb).AppendLine("Marshal(node.Value, ref objT, state);");
-            }
-            indent--;
-            sb.AppendLine("}");
+            WriteIndent(indent, sb).AppendLine("}");
         }
         indent--;
         sb.AppendLine("}");

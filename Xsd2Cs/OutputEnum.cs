@@ -110,6 +110,7 @@ internal sealed class OutputEnum : AOutputType
     {
         string name = $"{TargetNamespace}.{Name}";
 
+        WriteIndent(indent, sb).AppendLine("[MethodImpl(MethodImplOptions.AggressiveInlining)]");
         WriteIndent(indent, sb).AppendLine($"public static unsafe void Marshal(string? text, ref {name} objT, Relo.Tracker tracker)");
         WriteIndent(indent, sb).AppendLine("{");
         indent++;

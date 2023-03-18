@@ -197,7 +197,6 @@ internal sealed class OutputFile
 
         sb.AppendLine("using System.ComponentModel.DataAnnotations;");
         sb.AppendLine("using System.Runtime.CompilerServices;");
-        sb.AppendLine("using static global::Marshaler;");
         sb.AppendLine();
 
         sb.AppendLine("partial class Marshaler");
