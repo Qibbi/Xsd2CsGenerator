@@ -12,7 +12,7 @@ internal sealed class OutputStruct : AOutputType
     public XmlSchemaType? XmlBaseType { get; }
     public AOutputType? BaseType { get; private set; }
     public List<AOutputType> Types { get; } = new();
-    public List<AOutputMember> Members { get; } = new();
+    public List<(int, AOutputMember)> Members { get; } = new();
 
     public OutputStruct(IEnumerable<List<XmlSchemaType>> schemaTypes, Settings settings, XmlSchemaType schemaType, Xsd2Cs.Type? type) : base(settings, schemaType, type)
     {
@@ -32,12 +32,33 @@ internal sealed class OutputStruct : AOutputType
         }
     }
 
+    private static int SortMembers((int order, AOutputMember member) x, (int order, AOutputMember member) y)
+    {
+        if (x.member.Size < 4 || y.member.Size < 4)
+        {
+            if (x.member.Size > y.member.Size)
+            {
+                return 1;
+            }
+            if (x.member.Size < y.member.Size)
+            {
+                return -1;
+            }
+        }
+        if (x.order > y.order)
+        {
+            return 1;
+        }
+        return -1; // members never have the same original order index
+    }
+
     public override void Link(IReadOnlyList<OutputFile> files)
     {
         if (XmlBaseType is not null)
         {
             BaseType = GetOutputType(files, XmlBaseType) ?? throw new InvalidOperationException($"The base type '{XmlBaseType.Name}' for struct '{Name}' could not be found.");
         }
+        Members.Sort(SortMembers);
     }
 
     public override void WriteInheritedMemberDeclaration(int indent, StringBuilder sb)

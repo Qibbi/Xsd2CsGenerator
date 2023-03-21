@@ -171,7 +171,7 @@ internal sealed class OutputBitFlags : AOutputType
 
                 WriteIndent(indent, sb).AppendLine($"{EnumType!.TargetNamespace}.{EnumType!.Name} value = ({EnumType!.TargetNamespace}.{EnumType!.Name})(-1);");
                 WriteIndent(indent, sb).AppendLine("Marshal(token, ref value, tracker);");
-                WriteIndent(indent, sb).AppendLine($"tracker.InplaceEndianToPlatform(ref Unsafe.As<{EnumType!.TargetNamespace}.{EnumType!.Name}, uint>(ref value));");
+                WriteIndent(indent, sb).AppendLine($"tracker.InplaceEndianToPlatform(ref value);");
 
                 sb.AppendLine();
 

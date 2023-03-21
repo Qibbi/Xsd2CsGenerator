@@ -87,8 +87,7 @@ public sealed class Tracker : IDisposable
     private int Allocate(uint count, uint elementSize)
     {
         uint blockSize = (uint)(((count * elementSize) + 3) & -4);
-        Block block = new(blockSize);
-        _blocks.Add(block);
+        _blocks.Add(new Block(blockSize));
         _instanceBufferSize += blockSize;
         return _blocks.Count - 1;
     }
@@ -154,6 +153,54 @@ public sealed class Tracker : IDisposable
         if (IsBigEndian)
         {
             value = BinaryPrimitives.ReverseEndianness(value);
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void InplaceEndianToPlatform(ref long value)
+    {
+        if (IsBigEndian)
+        {
+            value = BinaryPrimitives.ReverseEndianness(value);
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void InplaceEndianToPlatform(ref ulong value)
+    {
+        if (IsBigEndian)
+        {
+            value = BinaryPrimitives.ReverseEndianness(value);
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void InplaceEndianToPlatform(ref float value)
+    {
+        if (IsBigEndian)
+        {
+            uint temp = BinaryPrimitives.ReverseEndianness(Unsafe.As<float, uint>(ref value));
+            value = Unsafe.As<uint, float>(ref temp);
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void InplaceEndianToPlatform(ref double value)
+    {
+        if (IsBigEndian)
+        {
+            ulong temp = BinaryPrimitives.ReverseEndianness(Unsafe.As<double, ulong>(ref value));
+            value = Unsafe.As<ulong, double>(ref temp);
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void InplaceEndianToPlatform<T>(ref T value) where T : struct, Enum
+    {
+        if (IsBigEndian)
+        {
+            uint temp = BinaryPrimitives.ReverseEndianness(Unsafe.As<T, uint>(ref value));
+            value = Unsafe.As<uint, T>(ref temp);
         }
     }
 

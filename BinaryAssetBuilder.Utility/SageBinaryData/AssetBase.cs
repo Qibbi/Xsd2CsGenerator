@@ -2,6 +2,16 @@
 
 namespace SageBinaryData;
 
+public struct AssetPointer<T> where T : unmanaged
+{
+    internal uint _offset;
+
+    public unsafe T* GetPointer(void* basePointer)
+    {
+        return (T*)((byte*)basePointer + _offset);
+    }
+}
+
 public interface IBaseAssetTypeInterface
 {
 }
